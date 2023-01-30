@@ -25,3 +25,25 @@ let mapdoble f g list =
 (*d*)
 (*tipo (fun '_weak1 -> int) -> ['_weak1] -> [int]*)
 (*siendo '_weak1 un tipo polimorfico*)
+
+
+(*dado un predicado ('a -> bool) -> ['a] -> 'a*)
+(*primero_que_cumple : ('a -> bool) -> ['a] -> 'a option*)
+let rec primero_que_cumple predicado list = match list with
+    [] -> None
+    | h :: t -> if (predicado h) then (Some h) else primero_que_cumple predicado t
+;;
+
+
+(* existe : ('a -> bool ) -> a' list -> bool*)
+(*exception x of String*)
+(*raise (x "not found")*)
+let rec existe predicado list = match list with
+    [] -> false
+    | h :: t -> if (predicado h) then true else primero_que_cumple predicado t
+;;
+
+let existe predicado list = match (primero_que_cuple predicado list) with
+   Some -> true
+   False -> false
+;;
