@@ -10,7 +10,7 @@ let rec mapdoble f g list = match list with
 let mapdoble f g list =
     let rec aux f g list result = match list with
         [] -> result
-        | h::t -> aux g f t (result :: (f h))
+        | h::t -> aux g f t ((f h) :: result)
     in aux f g list []
 ;;
 
