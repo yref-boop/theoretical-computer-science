@@ -24,11 +24,42 @@ let pre_order tree =
 let post_order tree =
     fold_tree (fun root left right -> left @ right @ [root]) [] tree;;
 
+
+let in_order tree =
+    let rec aux tree accumulator = match tree with
+        | Vacio -> accumulator
+        | Nodo (value, left, right) ->
+            let acc_with_right = aux right accumulator in
+            let acc_with_value = value :: acc_with_right in
+            aux left acc_with_value in
+    aux tree []
+;;
+
+let pre_order tree =
+    let rec aux tree accumulator = match tree with
+        | Vacio -> accumulator
+        | Nodo (value, left, right) ->
+            let acc_with_right = aux right accumulator in
+            let acc_with_left = aux left acc_with_right in
+            value :: acc_with_left in
+    aux tree []
+;;
+
+let post_order tree =
+    let rec aux tree accumulator = match tree with
+        | Vacio -> accumulator
+        | Nodo (value, left, right) ->
+            let acc_with_value = value :: accumulator in
+            let acc_with_right = aux right acc_with_value in
+            aux left acc_with_right in
+    aux tree []
+;;
+
 let anchura tree =
     let rec aux accum results = match accum with
         | [] -> List.rev results
         | Vacio :: t -> aux t results
         | (Nodo (root, left, right)) :: t ->
-            aux (t @ [left] @ [right]) (root :: results)
+            aux (List.rev (right :: left :: List.rev t)) (root :: results)
     in aux [tree] []
 ;;
