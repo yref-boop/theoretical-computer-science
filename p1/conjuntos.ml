@@ -59,6 +59,4 @@ let igual set1 set2 =
 let producto_cartesiano (Conjunto set1) (Conjunto set2) =
     List.concat (List.map (fun elem1 -> List.map (fun elem2 -> (elem1, elem2)) set2) set1)
 
-let list_of_conjunto (Conjunto set) =
-    set
-;;
+let list_of_conjunto (Conjunto set) = set ;;
