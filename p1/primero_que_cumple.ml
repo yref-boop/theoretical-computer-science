@@ -1,7 +1,7 @@
 (*dado un predicado ('a -> bool) -> ['a] -> 'a*)
 (*primero_que_cumple : ('a -> bool) -> ['a] -> 'a*)
 let rec primero_que_cumple predicado list = match list with
-    | [] -> raise (Invalid_argument "list")
+    | [] -> raise (Invalid_argument "empty list")
     | _ ->
         let rec aux predicado = function
             | [] -> raise (Not_found)
@@ -16,7 +16,7 @@ let rec existe predicado list =
     let check n = true in
     try check (primero_que_cumple predicado list) with
         | Not_found -> false
-        | Invalid_argument _ -> raise (Invalid_argument "list")
+        | Invalid_argument _ -> raise (Invalid_argument "empty list")
 ;;
 
 (*lista de pares (clave, valor)*)
