@@ -14,17 +14,13 @@ let agregar item (Conjunto set) =
         else Conjunto (item::set)
 ;;
 
-let conjunto_of_list list =
-    Conjunto list
-;;
+let conjunto_of_list list = Conjunto list ;;
 
 let suprimir item (Conjunto set) =
     Conjunto (List.filter (fun x -> x != item) set)
 ;;
 
-let cardinal (Conjunto set) =
-    List.length set
-;;
+let cardinal (Conjunto set) = List.length set ;;
 
 let rec union set1 = function
     | Conjunto [] -> set1
