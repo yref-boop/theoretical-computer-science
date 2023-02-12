@@ -1,12 +1,6 @@
 (*a*)
 (*mapdoble (function x -> x) (function x -> -x)*)
-(*recursiva simple*)
-let rec mapdoble f g = function
-    [] -> []
-    | h::t -> f h :: mapdoble g f t
-;;
 
-(*recursiva terminal*)
 let mapdoble f g list =
     let rec aux f g result = function
         [] -> result
