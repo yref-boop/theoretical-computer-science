@@ -41,3 +41,21 @@ let anchura tree =
             fold (root :: result) (List.rev (right :: left :: List.rev t))
     in fold [] [tree]
 ;;
+
+(* queues O(1) inserting & taking*)
+let anchura tree =
+    let queue = Queue.create () in
+    Queue.add tree queue;
+    let rec fold result queue =
+        if Queue.is_empty queue then List.rev result
+        else
+            let value = Queue.pop queue in
+            let aux result queue = function
+                | Vacio -> fold result queue
+                | Nodo (root, left, right) ->
+                    Queue.add left queue;
+                    Queue.add right queue;
+                    fold (root :: result) queue
+            in aux result queue value
+    in fold [] queue
+;;
