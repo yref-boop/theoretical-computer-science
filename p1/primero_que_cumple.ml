@@ -13,8 +13,8 @@ let rec primero_que_cumple predicado list = match list with
 (*exception x of String*)
 (*raise (x "not found")*)
 let rec existe predicado list =
-    let check n = true in
-    try check (primero_que_cumple predicado list) with
+    let check = function _ -> true
+    in try check (primero_que_cumple predicado list) with
         | Not_found -> false
         | Invalid_argument _ -> raise (Invalid_argument "empty list")
 ;;
@@ -22,13 +22,7 @@ let rec existe predicado list =
 (*lista de pares (clave, valor)*)
 (*dado conjunto y clave, devuelve valor*)
 let asociado lista valor =
-    let comprobar valor n = valor == n
-    in primero_que_cumple (comprobar valor) lista
-;;
-
-(*lista de pares (clave, valor)*)
-(*dado conjunto y clave, devuelve valor*)
-let asociado lista valor =
-    let comprobar valor n = valor == (fst n)
-    in snd (primero_que_cumple (comprobar valor) lista)
+    let check = function (a, b) -> a == valor
+    in  let (a, b) = primero_que_cumple check lista
+        in b
 ;;
