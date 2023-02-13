@@ -1,11 +1,13 @@
 (*a*)
 (*mapdoble (function x -> x) (function x -> -x)*)
 
-let mapdoble f g list =
-    let rec aux f g result = function
-        [] -> result
-        | h::t -> aux g f ((f h) :: result) t
-    in aux f g [] list
+let mapdoble f g list = match list with
+    | [] -> raise (Invalid_argument "empty list")
+    | _ ->
+        let rec aux f g result = function
+            [] -> result
+            | h::t -> aux g f ((f h) :: result) t
+        in aux f g [] list
 ;;
 
 (*b*)
