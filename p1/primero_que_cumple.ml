@@ -13,7 +13,7 @@ let rec primero_que_cumple predicado list = match list with
 (*exception x of String*)
 (*raise (x "not found")*)
 let rec existe predicado list =
-    try primero_que_cumple (function _ -> true) list with
+    try (function a -> true) (primero_que_cumple predicado list) with
         | Not_found -> false
         | Invalid_argument _ -> raise (Invalid_argument "empty list")
 ;;
