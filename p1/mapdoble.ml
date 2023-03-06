@@ -5,7 +5,7 @@ let mapdoble f g list = match list with
     | [] -> raise (Invalid_argument "empty list")
     | _ ->
         let rec aux f g result = function
-            [] -> result
+            [] -> List.rev result
             | h::t -> aux g f ((f h) :: result) t
         in aux f g [] list
 ;;
