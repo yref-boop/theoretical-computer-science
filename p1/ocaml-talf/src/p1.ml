@@ -32,6 +32,34 @@ let es_afne automata = match automata with
 ;;
 
 (*
+función es_afn(automata):
+  para cada estado en el automata:
+    para cada transición en las transiciones del estado:
+      si hay algúm símbolo de entrada duplicado en las transiciones del estado:
+        devolver true
+  devolver false
+*)
+
+let arco_determinista conjunto = function
+    Arco_af (origen, destino, simbolo) ->
+        let predicado = function Arco_af (i, o, s) ->
+            (simbolo = Terminal"") || (i = origen && o != destino && s = simbolo)
+        in
+        not (List.exists (predicado) conjunto)
+;;
+
+let es_afn automata = match automata with
+    Af (_, _, _, arcos, _) ->
+        let rec aux automata accumulator = function
+            | [] -> false
+            | arco :: lista ->
+                    if not (arco_determinista accumulator arco) then true
+                    else aux automata (arco :: accumulator) lista
+        in
+    aux automata [] (Conj.list_of_conjunto arcos)
+;;
+
+(*
 funcion es_afd(automata):
   simbolos_entrada_inicial = lista de símbolos de entrada de las transiciones del estado inicial del automata
   estados_visitados = [estado inicial del automata]
@@ -49,24 +77,7 @@ funcion es_afd(automata):
   devolver true
 *)
 
-let arco_determinista conjunto = function
-    Arco_af (origen, destino, simbolo) ->
-        let predicado = function Arco_af (i, o, s) ->
-            i = origen && o != destino && s = simbolo
-        in
-        not (List.exists (predicado) conjunto)
-;;
-
-let es_afn automata = match automata with
-    Af (_, _, _, arcos, _) ->
-        let rec aux automata accumulator = function
-            | [] -> false
-            | arco :: lista ->
-                    if not (arco_determinista accumulator arco) then true
-                    else aux automata (arco :: accumulator) lista
-        in
-    aux automata [] (Conj.list_of_conjunto arcos)
-;;
+let es_afd automata = not (es_afn automata);;
 
 (*
 function equivalentes (automata1, automata2):
