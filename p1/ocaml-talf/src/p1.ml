@@ -20,23 +20,7 @@ función es_afne(automata):
 *)
 open Auto;;
 
-let epsilon_transicion arco = match arco with
-    Arco_af (origen, out, simbolo) ->
-        (origen == Estado "") || (out == Estado "") || (simbolo == Terminal "")
-
-
-let es_afne (automata) = match automata with
-    Af (_, _, _, arcos, _) ->
-        let rec aux automata = function
-            | [] -> false
-            | Arco_af (_, _, simbolo) :: list ->
-                    if simbolo == Terminal "" then true
-                    else aux automata list
-        in
-    aux automata (Conj.list_of_conjunto arcos)
-;;
-
-let es_afne (automata) = match automata with
+let es_afne automata = match automata with
     Af (_, _, _, arcos, _) ->
         let rec aux automata = function
             | [] -> false
@@ -47,16 +31,6 @@ let es_afne (automata) = match automata with
     aux automata (Conj.list_of_conjunto arcos)
 ;;
 
-let es_afne (automata) = match automata with
-    Af (estados, _, _, _, _) ->
-        not ((Conj.cardinal (estados)) == (Conj.cardinal (Auto.epsilon_cierre estados automata)))
-;;
-
-
-let ec automata = match automata with
-    Af (estados, _, _, _, _) ->
-        Auto.epsilon_cierre estados automata
-;;
 (*
 funcion es_afd(automata):
   simbolos_entrada_inicial = lista de símbolos de entrada de las transiciones del estado inicial del automata
@@ -75,10 +49,23 @@ funcion es_afd(automata):
   devolver true
 *)
 
-let es_afd (automata) = match automata with
-    Af (estados, alfabeto, estado_inicial, function_transicion, estados_finales)
-    (* comprobar que para cada estado, funcion_transicion, (estado1, estado2, simbolo) estado1 no se repite *)
-    -> false;
+let arco_determinista conjunto = function
+    Arco_af (origen, destino, simbolo) ->
+        let predicado = function Arco_af (i, o, s) ->
+            i = origen && o != destino && s = simbolo
+        in
+        not (List.exists (predicado) conjunto)
+;;
+
+let es_afn automata = match automata with
+    Af (_, _, _, arcos, _) ->
+        let rec aux automata accumulator = function
+            | [] -> false
+            | arco :: lista ->
+                    if not (arco_determinista accumulator arco) then true
+                    else aux automata (arco :: accumulator) lista
+        in
+    aux automata [] (Conj.list_of_conjunto arcos)
 ;;
 
 (*
@@ -112,14 +99,8 @@ optativa: ocaml.talf -> simplificar & optimizar
 - (entender escanear_af)
 *)
 
-        Arco_af (Estado "2", Estado "3", Terminal "");
-        Arco_af (Estado "2", Estado "0", Terminal "");
-
-
 
 Terminal "";;
-
-
 
 let afne = Af (
     Conjunto [Estado "0"; Estado "1"; Estado "2"; Estado "3"],
@@ -128,6 +109,26 @@ let afne = Af (
         Arco_af (Estado "1", Estado "1", Terminal "b");
         Arco_af (Estado "2", Estado "3", Terminal "");
         Arco_af (Estado "2", Estado "0", Terminal "");
+        Arco_af (Estado "2", Estado "0", Terminal "");
+        Arco_af (Estado "1", Estado "2", Terminal "a");
+        Arco_af (Estado "2", Estado "3", Terminal "c")],
+    Conjunto [Estado "1"; Estado "3"])
+
+let afn = Af (
+    Conjunto [Estado "0"; Estado "1"; Estado "2"; Estado "3"],
+    Conjunto [Terminal "a"; Terminal "b"; Terminal "c"], Estado "0",
+    Conjunto [Arco_af (Estado "0", Estado "1", Terminal "a");
+        Arco_af (Estado "1", Estado "1", Terminal "b");
+        Arco_af (Estado "1", Estado "2", Terminal "a");
+        Arco_af (Estado "2", Estado "1", Terminal "c");
+        Arco_af (Estado "2", Estado "3", Terminal "c")],
+    Conjunto [Estado "1"; Estado "3"])
+
+let afd = Af (
+    Conjunto [Estado "0"; Estado "1"; Estado "2"; Estado "3"],
+    Conjunto [Terminal "a"; Terminal "b"; Terminal "c"], Estado "0",
+    Conjunto [Arco_af (Estado "0", Estado "1", Terminal "a");
+        Arco_af (Estado "1", Estado "1", Terminal "b");
         Arco_af (Estado "1", Estado "2", Terminal "a");
         Arco_af (Estado "2", Estado "3", Terminal "c")],
     Conjunto [Estado "1"; Estado "3"])
