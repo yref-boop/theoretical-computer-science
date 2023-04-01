@@ -80,6 +80,53 @@ funcion es_afd(automata):
 let es_afd automata = not (es_afn automata);;
 
 (*
+añadir estado_actual1, estado_actual2 a estados_visitados
+para cada simbolo en el alfabeto:
+    nuevo_estado1 = estado alcanzado desde el estado_actual_1 con el simbolo
+    nuevo_estado2 = estado alcanzado desde el estado_actual_2 con el simbolo
+    añadir (nuevo_estado1, nuevo_estado2) a la cola
+*)
+
+let rec siguiente estado simbolo = function
+    | [] -> estado;
+    | h :: t ->
+        match h with Arco_af (origen, destino, simbolo_arco) ->
+            if (origen = estado) && (simbolo_arco = simbolo)
+                then destino
+            else siguiente estado simbolo t
+;;
+
+let equivalentes (automata1, automata2) = match (automata1, automata2) with
+
+    (Af (_,alfabeto1,inicial1,arcos1,finales1),
+        Af(_,alfabeto2,inicial2,arcos2,finales2)) ->
+
+        let alfabeto = Conj.union alfabeto1 alfabeto2 in
+        let queue = Queue.create () in
+        Queue.add (inicial1, inicial2) queue;
+        let rec consume queue visitados =
+            if Queue.is_empty queue then true
+            else
+                let estado_actual = Queue.pop queue in
+                if Conj.pertenece estado_actual visitados
+                    then consume queue visitados
+                else
+                    if not ((Conj.pertenece (fst estado_actual) finales1) = (Conj.pertenece (snd estado_actual) finales2))
+                        then false
+                    else
+                    let rec procesar = function
+                        | [] -> consume queue (Conj.agregar estado_actual visitados)
+                        | h :: t ->
+                            let nuevo_estado1 = siguiente (fst estado_actual) h (Conj.list_of_conjunto arcos1) in
+                            let nuevo_estado2 = siguiente (snd estado_actual) h (Conj.list_of_conjunto arcos2) in
+                            Queue.add (nuevo_estado1, nuevo_estado2) queue;
+                            procesar t
+                    in
+                    procesar (Conj.list_of_conjunto alfabeto);
+    in consume queue Conj.conjunto_vacio
+;;
+
+(*
 function equivalentes (automata1, automata2):
     estados1 = estados del automata1
     estados_finales_1 = estados finales del automata 1
@@ -104,14 +151,11 @@ function equivalentes (automata1, automata2):
 *)
 
 
-
 (*
 optativa: ocaml.talf -> simplificar & optimizar
 - (entender escanear_af)
 *)
 
-
-Terminal "";;
 
 let afne = Af (
     Conjunto [Estado "0"; Estado "1"; Estado "2"; Estado "3"],
@@ -124,6 +168,7 @@ let afne = Af (
         Arco_af (Estado "1", Estado "2", Terminal "a");
         Arco_af (Estado "2", Estado "3", Terminal "c")],
     Conjunto [Estado "1"; Estado "3"])
+;;
 
 let afn = Af (
     Conjunto [Estado "0"; Estado "1"; Estado "2"; Estado "3"],
@@ -131,9 +176,10 @@ let afn = Af (
     Conjunto [Arco_af (Estado "0", Estado "1", Terminal "a");
         Arco_af (Estado "1", Estado "1", Terminal "b");
         Arco_af (Estado "1", Estado "2", Terminal "a");
-        Arco_af (Estado "2", Estado "1", Terminal "c");
-        Arco_af (Estado "2", Estado "3", Terminal "c")],
+        Arco_af (Estado "2", Estado "3", Terminal "c");
+        Arco_af (Estado "2", Estado "1", Terminal "c")],
     Conjunto [Estado "1"; Estado "3"])
+;;
 
 let afd = Af (
     Conjunto [Estado "0"; Estado "1"; Estado "2"; Estado "3"],
@@ -143,3 +189,4 @@ let afd = Af (
         Arco_af (Estado "1", Estado "2", Terminal "a");
         Arco_af (Estado "2", Estado "3", Terminal "c")],
     Conjunto [Estado "1"; Estado "3"])
+;;
