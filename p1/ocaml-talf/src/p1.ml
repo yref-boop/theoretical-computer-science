@@ -77,7 +77,14 @@ funcion es_afd(automata):
   devolver true
 *)
 
-let es_afd automata = not (es_afn automata);;
+let arcos_completos estados alfabeto arcos =
+    Conj.cardinal arcos = (Conj.cardinal alfabeto * Conj.cardinal estados)
+;;
+
+let es_afd automata = match automata with
+    Af (estados, alfabeto, _, arcos, _) ->
+        not (es_afn automata) && arcos_completos estados alfabeto arcos
+;;
 
 (*
 añadir estado_actual1, estado_actual2 a estados_visitados
@@ -149,6 +156,24 @@ function equivalentes (automata1, automata2):
                 añadir (nuevo_estado1, nuevo_estado2) a la cola
     devolver true
 *)
+
+let escaner_af cadena (Af (_, _, inicial, _, finales) as a) =
+
+   let rec aux = function
+
+        (Conj.Conjunto [], _) ->
+           false
+
+      | (actuales, []) ->
+           not (Conj.es_vacio (Conj.interseccion actuales finales))
+
+      | (actuales, simbolo :: t) ->
+           aux ((epsilon_cierre (avanza simbolo actuales a) a), t)
+
+   in
+      aux ((epsilon_cierre (Conjunto [inicial]) a), cadena)
+   ;;
+
 
 
 (*
