@@ -157,30 +157,33 @@ function equivalentes (automata1, automata2):
     devolver true
 *)
 
+(* original *)
 let escaner_af cadena (Af (_, _, inicial, _, finales) as a) =
 
    let rec aux = function
-
-        (Conj.Conjunto [], _) ->
-           false
-
-      | (actuales, []) ->
+        | (Conj.Conjunto [], _) -> false
+        | (actuales, []) ->
            not (Conj.es_vacio (Conj.interseccion actuales finales))
-
-      | (actuales, simbolo :: t) ->
+        | (actuales, simbolo :: t) ->
            aux ((epsilon_cierre (avanza simbolo actuales a) a), t)
-
    in
       aux ((epsilon_cierre (Conjunto [inicial]) a), cadena)
    ;;
 
+(* sin aceptar epsilon-transiciones *)
+let escaner_afn cadena (Af (_, _, inicial, _, finales) as a) =
 
+   let rec aux = function
+        | (Conj.Conjunto [], _) -> false
+        | (actuales, []) ->
+           not (Conj.es_vacio (Conj.interseccion actuales finales))
+        | (actuales, simbolo :: t) ->
+           aux (Auto.avanza simbolo actuales a, t)
+   in
+      aux (Conjunto [inicial], cadena)
+;;
 
-(*
-optativa: ocaml.talf -> simplificar & optimizar
-- (entender escanear_af)
-*)
-
+escaner_afn (Ergo.cadena_of_string "aa") afn;;
 
 let afne = Af (
     Conjunto [Estado "0"; Estado "1"; Estado "2"; Estado "3"],
