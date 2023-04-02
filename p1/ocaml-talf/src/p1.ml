@@ -20,15 +20,14 @@ función es_afne(automata):
 *)
 open Auto;;
 
-let es_afne automata = match automata with
-    Af (_, _, _, arcos, _) ->
-        let rec aux automata = function
-            | [] -> false
-            | Arco_af (_, _, simbolo) :: list ->
-                    if simbolo = Terminal "" then true
-                    else aux automata list
-        in
-    aux automata (Conj.list_of_conjunto arcos)
+let es_afne (Af (_, _, _, arcos, _) as automata) =
+    let rec aux automata = function
+        | [] -> false
+        | Arco_af (_, _, simbolo) :: list ->
+                if simbolo = Terminal "" then true
+                else aux automata list
+    in
+        aux automata (Conj.list_of_conjunto arcos)
 ;;
 
 (*
@@ -40,23 +39,21 @@ función es_afn(automata):
   devolver false
 *)
 
-let arco_determinista conjunto = function
-    Arco_af (origen, destino, simbolo) ->
-        let predicado = function Arco_af (i, o, s) ->
-            (simbolo = Terminal"") || (i = origen && o != destino && s = simbolo)
-        in
+let arco_determinista conjunto (Arco_af (origen, destino, simbolo)) =
+    let predicado (Arco_af (i, o, s)) =
+        (simbolo = Terminal"") || (i = origen && o != destino && s = simbolo)
+    in
         not (List.exists (predicado) conjunto)
 ;;
 
-let es_afn automata = match automata with
-    Af (_, _, _, arcos, _) ->
-        let rec aux automata accumulator = function
-            | [] -> false
-            | arco :: lista ->
-                    if not (arco_determinista accumulator arco) then true
-                    else aux automata (arco :: accumulator) lista
-        in
-    aux automata [] (Conj.list_of_conjunto arcos)
+let es_afn (Af (_, _, _, arcos, _) as automata) =
+    let rec aux automata accumulator = function
+        | [] -> false
+        | arco :: lista ->
+                if not (arco_determinista accumulator arco) then true
+                else aux automata (arco :: accumulator) lista
+    in
+        aux automata [] (Conj.list_of_conjunto arcos)
 ;;
 
 (*
