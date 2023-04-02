@@ -183,7 +183,31 @@ let escaner_afn cadena (Af (_, _, inicial, _, finales) as a) =
       aux (Conjunto [inicial], cadena)
 ;;
 
-escaner_afn (Ergo.cadena_of_string "aa") afn;;
+
+let avanza_determinista simbolo estado (Af (_, _, _, Conjunto arcos, _)) =
+    let rec aux = function
+        | [] -> Estado "vacio"
+        | Arco_af (origen, destino, simbolo_arco) :: t ->
+                if (simbolo_arco = simbolo) && (origen = estado) then
+                    destino
+                else aux t
+    in
+        aux arcos
+;;
+
+(* solo aceptando automatas finitos deterministas *)
+let escaner_afn cadena (Af (_, _, inicial, _, finales) as a) =
+
+   let rec aux = function
+        | (Estado "vacio", _) -> false
+        | (actual, []) ->
+           (Conj.pertenece actual finales)
+        | (actual, simbolo :: t) ->
+           aux (avanza_determinista simbolo actual a, t)
+   in
+      aux (inicial, cadena)
+;;
+
 
 let afne = Af (
     Conjunto [Estado "0"; Estado "1"; Estado "2"; Estado "3"],
