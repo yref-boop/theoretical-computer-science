@@ -142,10 +142,7 @@ function equivalentes (automata1, automata2):
     estados_visitados = conjunto vacio
     cola = [(estado_inicial1, estado_inicial2)]
     mientras cola no este vacia:
-        (estado_actual1, estado_actual2) = extraer el primer elemeento de la cola
-        si (estado_actual1, estado_actual2) esta en estados visitados:
-            continuar con el siguiente elemento de la cola
-        si estado_actual1 es final y estado_actual2 no es final o viceversa:
+        (estado_actual1, estado_actual2) = extraer el primer elemeento de la cola si (estado_actual1, estado_actual2) esta en estados visitados: continuar con el siguiente elemento de la cola si estado_actual1 es final y estado_actual2 no es final o viceversa:
             devolver false
         si no:
             añadir estado_actual1, estado_actual2 a estados_visitados
@@ -195,7 +192,7 @@ let avanza_determinista simbolo estado (Af (_, _, _, Conjunto arcos, _)) =
 ;;
 
 (* solo aceptando automatas finitos deterministas *)
-let escaner_afn cadena (Af (_, _, inicial, _, finales) as a) =
+let escaner_afd cadena (Af (_, _, inicial, _, finales) as a) =
 
    let rec aux = function
         | (Estado "vacio", _) -> false
@@ -233,11 +230,20 @@ let afn = Af (
 ;;
 
 let afd = Af (
-    Conjunto [Estado "0"; Estado "1"; Estado "2"; Estado "3"],
-    Conjunto [Terminal "a"; Terminal "b"; Terminal "c"], Estado "0",
-    Conjunto [Arco_af (Estado "0", Estado "1", Terminal "a");
-        Arco_af (Estado "1", Estado "1", Terminal "b");
+    Conjunto [Estado "0"; Estado "1"; Estado "2"],
+    Conjunto [Terminal "a"; Terminal "b"; Terminal "c"],
+    Estado "0",
+    Conjunto [
+        Arco_af (Estado "0", Estado "1", Terminal "a");
+        Arco_af (Estado "0", Estado "2", Terminal "b");
+        Arco_af (Estado "0", Estado "0", Terminal "c");
+
         Arco_af (Estado "1", Estado "2", Terminal "a");
-        Arco_af (Estado "2", Estado "3", Terminal "c")],
-    Conjunto [Estado "1"; Estado "3"])
+        Arco_af (Estado "1", Estado "1", Terminal "b");
+        Arco_af (Estado "1", Estado "0", Terminal "c");
+
+        Arco_af (Estado "2", Estado "0", Terminal "a");
+        Arco_af (Estado "2", Estado "1", Terminal "b");
+        Arco_af (Estado "2", Estado "2", Terminal "c")],
+    Conjunto [Estado "0"; Estado "2"])
 ;;
