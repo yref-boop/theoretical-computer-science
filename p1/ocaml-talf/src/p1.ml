@@ -1,23 +1,3 @@
-(*
-open Auto
-open Conj
-open Ergo
-open Graf
-*)
-
-(*
-función es_afne(automata):
-  para cada estado en el automata:
-    para cada transición en las transiciones del estado:
-      si el símbolo de entrada de la transición es epsilon:
-        devolver true
-  para cada estado en el autómata:
-    para cada transición en las transiciones del estado:
-      si el símbolo de entrada de la transición no es epsilon:
-        si el estado de destino tiene épsilon-transiciones:
-          devolver true
-  devolver false
-*)
 open Auto;;
 
 let es_afne (Af (_, _, _, (Conjunto arcos), _) as automata) =
@@ -29,15 +9,6 @@ let es_afne (Af (_, _, _, (Conjunto arcos), _) as automata) =
     in
         aux automata arcos
 ;;
-
-(*
-función es_afn(automata):
-  para cada estado en el automata:
-    para cada transición en las transiciones del estado:
-      si hay algúm símbolo de entrada duplicado en las transiciones del estado:
-        devolver true
-  devolver false
-*)
 
 (* no deben existir otros arcos con igual origen y simbolo ni epsilon *)
 let arco_determinista conjunto (Arco_af (origen, destino, simbolo)) =
@@ -57,24 +28,6 @@ let es_afn (Af (_, _, _, (Conjunto arcos), _) as automata) =
         aux automata [] arcos
 ;;
 
-(*
-funcion es_afd(automata):
-  simbolos_entrada_inicial = lista de símbolos de entrada de las transiciones del estado inicial del automata
-  estados_visitados = [estado inicial del automata]
-  para cada estado en estados_visitados:
-    transiciones_estado = lista de transiciones del estado en el automata
-    simbolos_entrada = lista de simbolos de entrada de las transiciones_estado
-    si hay algún símbolo de entrada duplicado en simbolos_entrada:
-      devuelve false
-    para cada símbolo de simbolos_entrada:
-      destino = estado de destino de la transición correcpondiente al símbolo
-      si el destino no es un estado del autómata:
-        devolver false
-      si el destino no está en estados_visitados:
-        añadir destino a estados_visitados
-  devolver true
-*)
-
 (* revisar que el numero de arcos es el correcto *)
 let arcos_completos estados alfabeto arcos =
     Conj.cardinal arcos = (Conj.cardinal alfabeto * Conj.cardinal estados)
@@ -85,14 +38,8 @@ let es_afd automata = match automata with
         not (es_afn automata) && arcos_completos estados alfabeto arcos
 ;;
 
-(*
-añadir estado_actual1, estado_actual2 a estados_visitados
-para cada simbolo en el alfabeto:
-    nuevo_estado1 = estado alcanzado desde el estado_actual_1 con el simbolo
-    nuevo_estado2 = estado alcanzado desde el estado_actual_2 con el simbolo
-    añadir (nuevo_estado1, nuevo_estado2) a la cola
-*)
 
+(* para todos los simbolos del alfabeto, busca el destino donde llega *)
 let rec siguiente estado simbolo = function
     | [] -> estado;
     | h :: t ->
@@ -132,28 +79,8 @@ let equivalentes (automata1, automata2) = match (automata1, automata2) with
     in consume queue Conj.conjunto_vacio
 ;;
 
-(*
-function equivalentes (automata1, automata2):
-    estados1 = estados del automata1
-    estados_finales_1 = estados finales del automata 1
-    estados2 = estados del automata2
-    estados_finales_2 = estados finales del automata 2
-    alfabeto = alfabeto del automata1 y del automata2
-    estados_visitados = conjunto vacio
-    cola = [(estado_inicial1, estado_inicial2)]
-    mientras cola no este vacia:
-        (estado_actual1, estado_actual2) = extraer el primer elemeento de la cola si (estado_actual1, estado_actual2) esta en estados visitados: continuar con el siguiente elemento de la cola si estado_actual1 es final y estado_actual2 no es final o viceversa:
-            devolver false
-        si no:
-            añadir estado_actual1, estado_actual2 a estados_visitados
-            para cada simbolo en el alfabeto:
-                nuevo_estado1 = estado alcanzado desde el estado_actual_1 con el simbolo
-                nuevo_estado2 = estado alcanzado desde el estado_actual_2 con el simbolo
-                añadir (nuevo_estado1, nuevo_estado2) a la cola
-    devolver true
-*)
 
-(* original *)
+(* funcion original *)
 let escaner_af cadena (Af (_, _, inicial, _, finales) as a) =
 
    let rec aux = function
@@ -164,7 +91,7 @@ let escaner_af cadena (Af (_, _, inicial, _, finales) as a) =
            aux ((epsilon_cierre (avanza simbolo actuales a) a), t)
    in
       aux ((epsilon_cierre (Conjunto [inicial]) a), cadena)
-   ;;
+;;
 
 (* sin aceptar epsilon-transiciones *)
 let escaner_afn cadena (Af (_, _, inicial, _, finales) as a) =
@@ -179,7 +106,7 @@ let escaner_afn cadena (Af (_, _, inicial, _, finales) as a) =
       aux (Conjunto [inicial], cadena)
 ;;
 
-
+(* auxiliar avanza para escaner determinista *)
 let avanza_determinista simbolo estado (Af (_, _, _, Conjunto arcos, _)) =
     let rec aux = function
         | [] -> Estado "vacio"
@@ -199,7 +126,7 @@ let escaner_afd cadena (Af (_, _, inicial, _, finales) as a) =
         | (actual, []) ->
            (Conj.pertenece actual finales)
         | (actual, simbolo :: t) ->
-           aux (avanza_determinista simbolo actual a, t)
+           aux ((avanza_determinista simbolo actual a), t)
    in
       aux (inicial, cadena)
 ;;
